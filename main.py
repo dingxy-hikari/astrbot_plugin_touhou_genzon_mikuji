@@ -77,7 +77,7 @@ class MyPlugin(Star):
         lt, res = draw_3d6()
         chain = [
             Comp.At(qq=event.get_sender_id()),
-            Comp.Plain(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}"),
+            Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
             Comp.Image.fromFileSystem(str(CURRENT_PATH/"resource"/"mikuji"/f"{res:03d}.png"))
         ]
         yield event.chain_result(chain)
