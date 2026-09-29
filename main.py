@@ -75,8 +75,8 @@ class MyPlugin(Star):
             Comp.Plain(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}"),
             Comp.Image.fromFileSystem(f"resource/mikuji/{res:0>3}.png")
         ]
-        yield event.plain_result("抽取一些神签")
-        #yield event.chain_result(chain)
+        # yield event.plain_result("抽取一些神签")
+        yield event.chain_result(chain)
 
     @filter.command("draw_mikuji", alias={"抽今日幻存神签", "今日幻存神签", "抽取今日幻存神签"})
     async def draw_mikuji(self):
