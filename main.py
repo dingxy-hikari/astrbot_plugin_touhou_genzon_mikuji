@@ -80,14 +80,11 @@ class MyPlugin(Star):
             Comp.Plain(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}"),
             Comp.Image.fromFileSystem(str(CURRENT_PATH/"resource"/"mikuji"/f"{res:03d}.png"))
         ]
-        yield event.plain_result("抽取一些神签")
-        yield event.plain_result(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}")
-        yield event.plain_result(str(CURRENT_PATH/"resource"/"mikuji"/f"{res:03d}.png"))
         yield event.chain_result(chain)
 
-    @filter.command("draw_mikuji", alias={"抽今日幻存神签", "今日幻存神签", "抽取今日幻存神签"})
-    async def draw_mikuji(self):
-        pass
+    @filter.command("draw_mikuji", alias={"抽幻存神签", "幻存神签", "抽取幻存神签"})
+    async def draw_mikuji(self,event: AstrMessageEvent):
+        self.draw_random_mikuji(event)
 
     async def terminate(self):
         """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
