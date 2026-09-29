@@ -32,11 +32,13 @@ def draw_3d6():
     # 模拟书中的六面骰法
     roll2 = 0
     roll3 = 0
-    while roll1 := rd.randint(1, 6) <= 4:
-        roll2 = rd.randint(1, 6)
-        roll3 = rd.randint(1, 6)
+    while (roll1 := rd.randint(1, 6)):
+        if roll1 <= 4:
+            roll2 = rd.randint(1, 6)
+            roll3 = rd.randint(1, 6)
+            break
     lt = [roll1, roll2, roll3]
-    if res := roll1 * 36 + roll2 * 6 + roll3 - 42 >= 128:
+    if (res := roll1 * 36 + roll2 * 6 + roll3 - 42) >= 128:
         return draw_3d6()
     else:
         return lt, res
