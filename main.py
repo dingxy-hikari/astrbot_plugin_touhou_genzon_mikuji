@@ -79,6 +79,7 @@ class MyPlugin(Star):
             Comp.Image.fromFileSystem(str(CURRENT_PATH/"resource"/"mikuji"/f"{res:0>3}.png"))
         ]
         yield event.plain_result("抽取一些神签")
+        yield event.plain_result(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}")
         yield event.plain_result(str(CURRENT_PATH/"resource"/"mikuji"/f"{res:0>3}.png"))
         yield event.chain_result(chain)
 
