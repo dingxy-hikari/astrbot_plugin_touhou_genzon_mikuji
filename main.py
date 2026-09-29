@@ -73,7 +73,7 @@ class MyPlugin(Star):
         chain = [
             Comp.At(qq=event.get_sender_id()),
             Comp.Plain(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}"),
-            Comp.Image.fromFileSystem(f"/resource/mikuji/{res:0>3}.png")
+            Comp.Image.fromFileSystem(f"../resource/mikuji/{res:0>3}.png")
         ]
         yield event.plain_result("抽取一些神签")
         yield event.chain_result(chain)
