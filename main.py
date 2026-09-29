@@ -4,6 +4,7 @@ import astrbot.api.message_components as Comp
 from astrbot.api import logger, AstrBotConfig
 
 import random as rd
+from pathlib import Path as pt
 
 # 常量，配置文件相关
 MODE_DAILY = 1
@@ -12,6 +13,8 @@ MODE_RANDOM = 2
 ROLL_7D2 = 1
 ROLL_3D6 = 2
 ROLL_D128 = 3
+
+CURRENT_PATH = pt(__file__).parent
 
 
 def draw_7d2():
@@ -73,9 +76,10 @@ class MyPlugin(Star):
         chain = [
             Comp.At(qq=event.get_sender_id()),
             Comp.Plain(f"您抽到的是：{lt[0] * 36}+{lt[1] * 6}+{lt[2]}-42={res}"),
-            Comp.Image.fromFileSystem(f"../resource/mikuji/{res:0>3}.png")
+            Comp.Image.fromFileSystem(f"{str(CURRENT_PATH)}/resource/mikuji/{res:0>3}.png")
         ]
         yield event.plain_result("抽取一些神签")
+        yield event.plain_result(str(CURRENT_PATH))
         yield event.chain_result(chain)
 
     @filter.command("draw_mikuji", alias={"抽今日幻存神签", "今日幻存神签", "抽取今日幻存神签"})
