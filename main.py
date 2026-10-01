@@ -64,8 +64,8 @@ def draw():
 @register("astrbot_plugin_touhou_genzon_mikuji", "dingxy-hikari",
           "A plugin that makes bot can draw a mikuji and send to chat", "1.1.1")
 class MyPlugin(Star):
-    def __init__(self, context: Context,config: AstrBotConfig):
-        super().__init__(context)
+    def __init__(self, context: Context,config: AstrBotConfig|None):
+        super().__init__(context,config)
         self.config = config
         self.plugin_data_path = (
                 Path(get_astrbot_data_path()) / "plugin_data" / self.name
