@@ -53,9 +53,10 @@ class MyPlugin(Star):
         self.plugin_data_path = (
                 Path(get_astrbot_data_path()) / "plugin_data" / self.name
         )
+        if not self.plugin_data_path.exists():
+            self.plugin_data_path.mkdir(parents=True, exist_ok=True)
         self.record_path = self.plugin_data_path / "record.json"
         self._date = self.date_update()
-        print(self.config)
 
     def draw(self):
         match (self.config["drawing_method"]):
@@ -98,7 +99,7 @@ class MyPlugin(Star):
         yield event.chain_result(chain)
 
     def date_update(self):
-        """"""
+        """日期更新函数"""
         td = dt.date.today()
         return f"{td.year}{td.month:02d}{td.day:02d}"
 
@@ -115,7 +116,7 @@ class MyPlugin(Star):
         finally:
             if record["date"] != self._date:
                 self.record_save(dict())
-                return {}
+                return None
             else:
                 return record["data"]
 
@@ -143,6 +144,15 @@ class MyPlugin(Star):
     @filter.command("draw_mikuji", alias={"抽幻存神签", "幻存神签", "抽取幻存神签"})
     async def draw_mikuji(self, event: AstrMessageEvent):
         """根据Config的配置抽随机幻存神签(默认)或者抽每日幻存神签"""
+        match(self.config["default_draw_mikuji_behavior"]):
+            case "Daily":
+                async for i in self.daily_mikuji(event):
+                    yield i
+            case "Random":
+                async for i in self.random_mikuji(event):
+                    yield i
+
+
 
     async def terminate(self):
         """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
