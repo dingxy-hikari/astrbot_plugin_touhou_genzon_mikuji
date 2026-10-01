@@ -1,0 +1,21 @@
+{
+  "drawing_method":{
+    "description":"The way to draw a mikuji(Simulated from book)",
+    "type": "string",
+    "options": [
+      "3d6",
+      "7d2",
+      "d128"
+    ],
+    "default": "3d6"
+  },
+  "default_draw_mikuji_behavior": {
+    "description":"The behavior of \"/draw_mikuji\"",
+    "type": "string",
+    "options": [
+      "Daily",
+      "Random"
+    ],
+    "default": "Random"
+  }
+}
