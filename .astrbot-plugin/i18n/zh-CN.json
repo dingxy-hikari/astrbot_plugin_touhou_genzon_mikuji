@@ -2,5 +2,17 @@
   "metadata": {
     "display_name": "东方幻存神签",
     "desc": "允许机器人抽取东方幻存神签并发送到聊天"
+  },
+  "config": {
+    "drawing_method":{
+      "description":"抽取神签的方法（模拟书中介绍的方式）"
+    },
+    "default_draw_mikuji_behavior": {
+      "description":"\"/抽取神签\"命令的行为",
+      "options": [
+        "每日神签",
+        "随机神签"
+      ]
+    }
   }
 }
