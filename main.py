@@ -90,7 +90,7 @@ class MyPlugin(Star):
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
             ]
             if event.get_group_id() == "":
-                chain.insert(0,Comp.At(qq=event.get_sender_id()))
+                chain.insert(0,Comp.At(qq=receive))
             data[receive] = res
             self.record_save(data)
         else:
