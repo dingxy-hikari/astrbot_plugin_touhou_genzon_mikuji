@@ -71,10 +71,11 @@ class MyPlugin(Star):
         """抽随机幻存神签的底层实现"""
         lt, res = self.draw()
         chain = [
-            Comp.At(qq=event.get_sender_id()),
             Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
             Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
         ]
+        if event.get_group_id() == "":
+            chain.insert(0,Comp.At(qq=event.get_sender_id()))
         yield event.chain_result(chain)
 
     async def daily_mikuji(self, event: AstrMessageEvent):
@@ -88,6 +89,8 @@ class MyPlugin(Star):
                 Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
             ]
+            if event.get_group_id() == "":
+                chain.insert(0,Comp.At(qq=event.get_sender_id()))
             data[receive] = res
             self.record_save(data)
         else:
@@ -96,6 +99,8 @@ class MyPlugin(Star):
                 Comp.Plain(f"您今天抽过了，抽到的是：{data[receive]}"),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{data[receive]:03d}.png"))
             ]
+            if event.get_group_id() == "":
+                chain.insert(0,Comp.At(qq=receive))
         yield event.chain_result(chain)
 
     def date_update(self):
