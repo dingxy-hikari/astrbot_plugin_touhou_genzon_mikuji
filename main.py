@@ -21,23 +21,20 @@ def draw_7d2():
         lt.append(rd.randint(0, 1))
     for i in range(7):
         res += lt[6 - i] * (2 ** i)
-    return lt, res
+    return lt, res + 1
 
 
 def draw_3d6():
     # 模拟书中的六面骰法
-    roll2 = 0
-    roll3 = 0
-    while roll1 := rd.randint(1, 6):
-        if roll1 <= 4:
-            roll2 = rd.randint(1, 6)
-            roll3 = rd.randint(1, 6)
-            break
-    lt = [roll1, roll2, roll3]
-    if (res := roll1 * 36 + roll2 * 6 + roll3 - 42) >= 128:
-        return draw_3d6()
-    else:
-        return lt, res
+    while True:
+        roll1 = rd.randint(1, 6)
+        if roll1 > 4:
+            continue
+        roll2 = rd.randint(1, 6)
+        roll3 = rd.randint(1, 6)
+        res = roll1 * 36 + roll2 * 6 + roll3 - 42
+        if res <= 128:
+            return [roll1, roll2, roll3], res
 
 
 def draw_d128():
@@ -56,22 +53,25 @@ class MyPlugin(Star):
         if not self.plugin_data_path.exists():
             self.plugin_data_path.mkdir(parents=True, exist_ok=True)
         self.record_path = self.plugin_data_path / "record.json"
-        self._date = self.date_update()
 
     def draw(self):
         match (self.config["drawing_method"]):
             case "d128":
-                return draw_d128()
+                res = draw_d128()
+                return str(res), res
             case "7d2":
-                return draw_7d2()
+                coins, res = draw_7d2()
+                faces = "".join("反" if coin else "正" for coin in coins)
+                return f"{faces}，第{res}号", res
             case _:
-                return draw_3d6()
+                (roll1, roll2, roll3), res = draw_3d6()
+                return f"{roll1}*36+{roll2}*6+{roll3}-42={res}", res
 
     async def random_mikuji(self, event: AstrMessageEvent):
         """抽随机幻存神签的底层实现"""
-        lt, res = self.draw()
+        detail, res = self.draw()
         chain = [
-            Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
+            Comp.Plain(f"您抽到的是：{detail}"),
             Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
         ]
         if event.get_group_id() == "":
@@ -80,19 +80,20 @@ class MyPlugin(Star):
 
     async def daily_mikuji(self, event: AstrMessageEvent):
         """抽每日幻存神签的底层实现"""
-        data = self.record_read()
+        today = self.date_update()
+        data = self.record_read(today)
         receive = event.get_sender_id()
-        if receive not in data.keys():
-            lt, res = self.draw()
+        if data.get(receive) not in range(1, 129):
+            detail, res = self.draw()
             chain = [
                 Comp.At(qq=event.get_sender_id()),
-                Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
+                Comp.Plain(f"您抽到的是：{detail}"),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
             ]
             if event.get_group_id() == "":
                 chain.insert(0,Comp.At(qq=receive))
             data[receive] = res
-            self.record_save(data)
+            self.record_save(data, today)
         else:
             chain = [
                 Comp.At(qq=receive),
@@ -108,27 +109,19 @@ class MyPlugin(Star):
         td = dt.date.today()
         return f"{td.year}{td.month:02d}{td.day:02d}"
 
-    def record_read(self):
+    def record_read(self, today):
         """从数据文件读取今日抽取数据"""
-        self.date_update()
         try:
             with open(self.record_path, "r", encoding="utf-8") as rf:
                 record = json.load(rf)
         except FileNotFoundError:
-            self.record_save(dict())
-            with open(self.record_path, "r", encoding="utf-8") as rf:
-                record = json.load(rf)
-        finally:
-            if record["date"] != self._date:
-                self.record_save(dict())
-                return None
-            else:
-                return record["data"]
+            return {}
+        return record["data"] if record["date"] == today else {}
 
-    def record_save(self, record: dict):
+    def record_save(self, record: dict, today):
         """将今日抽取数据保存至数据文件"""
         with open(self.record_path, "w", encoding="utf-8") as rf:
-            wdata = dict(date=self._date, data=record)
+            wdata = dict(date=today, data=record)
             json.dump(wdata, rf)
 
     async def initialize(self):
