@@ -163,6 +163,7 @@ class MyPlugin(Star):
 
     @filter.command("help_mikuji", alias={"幻存神签帮助", "神签帮助"})
     async def help_mikuji(self, event: AstrMessageEvent):
+        """插件帮助"""
         chain = [
             Comp.Plain("幻存神签插件帮助："),
             Comp.Plain("本插件所使用东方幻存神签汉化图片均来自「吃不飽」汉化组"),
@@ -172,6 +173,7 @@ class MyPlugin(Star):
             Comp.Plain("使用/今日神签,/抽今日幻存神签, /今日幻存神签, /抽取今日幻存神签以获取今日内唯一神签"),
             Comp.Plain("使用/随机神签,/抽随机幻存神签, /随机幻存神签, /抽取随机幻存神签以随机抽取一张"),
             Comp.Plain("使用/神签,/抽幻存神签, /幻存神签, /抽取幻存神签以根据插件默认行为抽取"),
+            Comp.Plain("使用/神签帮助,/幻存神签帮助重新显示帮助"),
         ]
         match(self.config["default_draw_mikuji_behavior"]):
             case "Daily":
