@@ -21,7 +21,7 @@ def draw_7d2():
         lt.append(rd.randint(0, 1))
     for i in range(7):
         res += lt[6 - i] * (2 ** i)
-    return lt, res
+    return f"您抽到的是：{lt[0]}*64+{lt[1]}*32+{lt[2]}*16+{lt[3]}*8+{lt[4]}*4+{lt[5]}*2+{lt[6]}*1={res}",res
 
 
 def draw_3d6():
@@ -37,11 +37,13 @@ def draw_3d6():
     if (res := roll1 * 36 + roll2 * 6 + roll3 - 42) >= 128:
         return draw_3d6()
     else:
-        return lt, res
+        return f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}",res
+
 
 
 def draw_d128():
-    return rd.randint(1, 128)
+    res = rd.randint(1, 128)
+    return f"您抽到的是：r1d128={res}",res
 
 
 @register("astrbot_plugin_touhou_genzon_mikuji", "dingxy-hikari",
@@ -71,7 +73,7 @@ class MyPlugin(Star):
         """抽随机幻存神签的底层实现"""
         lt, res = self.draw()
         chain = [
-            Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
+            Comp.Plain(lt),
             Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
         ]
         if event.get_group_id() == "":
@@ -82,10 +84,10 @@ class MyPlugin(Star):
         """抽每日幻存神签的底层实现"""
         data = self.record_read()
         receive = event.get_sender_id()
-        if receive not in data.keys():
+        if data is None or receive not in data.keys():
             lt, res = self.draw()
             chain = [
-                Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
+                Comp.Plain(lt),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
             ]
             if event.get_group_id() != "":
@@ -125,9 +127,13 @@ class MyPlugin(Star):
 
     def record_save(self, record: dict):
         """将今日抽取数据保存至数据文件"""
+        pdata = None
+        with open(self.record_path, "r", encoding="utf-8") as rf:
+            pdata = json.load(rf)
         with open(self.record_path, "w", encoding="utf-8") as rf:
-            wdata = dict(date=self._date, data=record)
-            json.dump(wdata, rf)
+            pdata["date"] = self._date
+            pdata["record"].update(record)
+            json.dump(pdata, rf)
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
