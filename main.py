@@ -85,21 +85,19 @@ class MyPlugin(Star):
         if receive not in data.keys():
             lt, res = self.draw()
             chain = [
-                Comp.At(qq=event.get_sender_id()),
                 Comp.Plain(f"您抽到的是：{lt[0]}*36+{lt[1]}*6+{lt[2]}-42={res}"),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{res:03d}.png"))
             ]
-            if event.get_group_id() == "":
-                chain.insert(0,Comp.At(qq=receive))
+            if event.get_group_id() != "":
+                chain.insert(0,Comp.At(qq=event.get_sender_id()))
             data[receive] = res
             self.record_save(data)
         else:
             chain = [
-                Comp.At(qq=receive),
                 Comp.Plain(f"您今天抽过了，抽到的是：{data[receive]}"),
                 Comp.Image.fromFileSystem(str(CURRENT_PATH / "resource" / "mikuji" / f"{data[receive]:03d}.png"))
             ]
-            if event.get_group_id() == "":
+            if event.get_group_id() != "":
                 chain.insert(0,Comp.At(qq=receive))
         yield event.chain_result(chain)
 
@@ -134,19 +132,19 @@ class MyPlugin(Star):
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
 
-    @filter.command("draw_daily_mikuji", alias={"抽今日幻存神签", "今日幻存神签", "抽取今日幻存神签"})
+    @filter.command("draw_daily_mikuji", alias={"抽今日幻存神签", "今日幻存神签", "抽取今日幻存神签","今日神签"})
     async def draw_daily_mikuji(self, event: AstrMessageEvent):
         """抽每日幻存神签"""
         async for i in self.daily_mikuji(event):
             yield i
 
-    @filter.command("draw_random_mikuji", alias={"抽随机幻存神签", "随机幻存神签", "抽取随机幻存神签"})
+    @filter.command("draw_random_mikuji", alias={"抽随机幻存神签", "随机幻存神签", "抽取随机幻存神签","随机神签"})
     async def draw_random_mikuji(self, event: AstrMessageEvent):
         """抽随机幻存神签"""
         async for i in self.random_mikuji(event):
             yield i
 
-    @filter.command("draw_mikuji", alias={"抽幻存神签", "幻存神签", "抽取幻存神签"})
+    @filter.command("draw_mikuji", alias={"抽幻存神签", "幻存神签", "抽取幻存神签","神签"})
     async def draw_mikuji(self, event: AstrMessageEvent):
         """根据Config的配置抽随机幻存神签(默认)或者抽每日幻存神签"""
         match(self.config["default_draw_mikuji_behavior"]):
@@ -156,6 +154,27 @@ class MyPlugin(Star):
             case "Random":
                 async for i in self.random_mikuji(event):
                     yield i
+
+    @filter.command("help_mikuji", alias={"幻存神签帮助", "神签帮助"})
+    async def help_mikuji(self, event: AstrMessageEvent):
+        chain = [
+            Comp.Plain("幻存神签插件帮助："),
+            Comp.Plain("本插件所使用东方幻存神签汉化图片均来自「吃不飽」汉化组"),
+            Comp.Plain("源发布页面："),
+            Comp.Plain("https://www.bilibili.com/opus/1184664409608290304"),
+            Comp.Plain("https://www.bilibili.com/opus/1184896638522490897"),
+            Comp.Plain("使用/今日神签,/抽今日幻存神签, /今日幻存神签, /抽取今日幻存神签以获取今日内唯一神签"),
+            Comp.Plain("使用/随机神签,/抽随机幻存神签, /随机幻存神签, /抽取随机幻存神签以随机抽取一张"),
+            Comp.Plain("使用/神签,/抽幻存神签, /幻存神签, /抽取幻存神签以根据插件默认行为抽取"),
+        ]
+        match(self.config["default_draw_mikuji_behavior"]):
+            case "Daily":
+                chain.insert(len(chain)-1,Comp.Plain("当前/神签默认行为：/今日神签"))
+            case "Random":
+                chain.insert(len(chain)-1,Comp.Plain("当前/神签默认行为：/随机神签"))
+        if event.get_group_id() != "":
+            chain.insert(0,Comp.At(qq=event.get_sender_id()))
+        yield event.chain_result(chain)
 
 
 

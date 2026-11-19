@@ -6,8 +6,8 @@
 
 本项目所使用东方幻存神签汉化图片均来自「吃不飽」汉化组
 源发布页面：
-- [https://www.bilibili.com/opus/1184664409608290304
-- [https://www.bilibili.com/opus/1184896638522490897
+- https://www.bilibili.com/opus/1184664409608290304
+- https://www.bilibili.com/opus/1184896638522490897
 ![AUTHORIZE.jpg](AUTHORIZE.jpg "授权图片")
 
 # Supports
